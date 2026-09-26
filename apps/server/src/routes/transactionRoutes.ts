@@ -1,10 +1,10 @@
 import { FastifyInstance, FastifyPluginAsync } from "fastify";
-import { Type } from "@sinclair/typebox";
 import { transactionController } from "../controllers/transactionController.js";
 import {
-  createTransactionBodySchema,
+  CreateTransactionBodySchema,
   TransactionResponseSchema,
   GetTransactionsQuerySchema,
+  TransactionListResponseSchema,
 } from "../schemas/transactionSchema.js";
 
 export const transactionRoutes: FastifyPluginAsync = async (
@@ -14,7 +14,7 @@ export const transactionRoutes: FastifyPluginAsync = async (
     "/transactions",
     {
       schema: {
-        body: createTransactionBodySchema,
+        body: CreateTransactionBodySchema,
         response: {
           201: TransactionResponseSchema,
         },
@@ -28,7 +28,7 @@ export const transactionRoutes: FastifyPluginAsync = async (
       schema: {
         querystring: GetTransactionsQuerySchema,
         response: {
-          200: Type.Array(TransactionResponseSchema),
+          200: TransactionListResponseSchema,
         },
       },
     },

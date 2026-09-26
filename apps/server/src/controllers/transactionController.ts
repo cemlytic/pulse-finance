@@ -14,7 +14,7 @@ export class TransactionController {
       const transaction = await transactionService.createTransaction(
         request.body,
       );
-      return reply.code(200).send(transaction);
+      return reply.code(201).send(transaction);
     } catch (error: any) {
       if (error.message === "CATEGORY_NOT_FOUND") {
         return reply.badRequest("Invalid category id");
@@ -33,7 +33,10 @@ export class TransactionController {
         request.query,
       );
       return reply.code(200).send(transactions);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === "INVALID_CURSOR") {
+        return reply.badRequest("Malformed pagination cursor");
+      }
       request.log.error(error, "error listing transactions");
       return reply.internalServerError("Could not fetch transactions");
     }

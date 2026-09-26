@@ -1,8 +1,13 @@
-import { Type, Static, Union } from "@sinclair/typebox";
+import { Type, Static } from "@sinclair/typebox";
 
-export const createTransactionBodySchema = Type.Object({
+export const MongoIdSchema = Type.String({
+  pattern: "^[0-9a-fA-F]{24}$",
+  description: "24-character hexadecimal MongoDB ObjectId",
+});
+
+export const CreateTransactionBodySchema = Type.Object({
   userId: Type.String({ minLength: 1 }),
-  categoryId: Type.String({ minLength: 24, maxLength: 24 }),
+  categoryId: MongoIdSchema,
   amountCents: Type.Integer({ minimum: 1 }),
   type: Type.Union([Type.Literal("INCOME"), Type.Literal("EXPENSE")]),
   description: Type.Optional(Type.String({ maxLength: 255 })),
@@ -10,7 +15,7 @@ export const createTransactionBodySchema = Type.Object({
 });
 
 export type CreateTransactionBodyType = Static<
-  typeof createTransactionBodySchema
+  typeof CreateTransactionBodySchema
 >;
 
 export const TransactionResponseSchema = Type.Object({
@@ -27,11 +32,20 @@ export const TransactionResponseSchema = Type.Object({
 export type TransactionResponseType = Static<typeof TransactionResponseSchema>;
 
 export const GetTransactionsQuerySchema = Type.Object({
-  userId: Type.String(),
+  userId: Type.String({ minLength: 1 }),
   limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 100, default: 20 })),
   cursor: Type.Optional(Type.String()),
 });
 
 export type GetTransactionsQueryType = Static<
   typeof GetTransactionsQuerySchema
+>;
+
+export const TransactionListResponseSchema = Type.Object({
+  items: Type.Array(TransactionResponseSchema),
+  nextCursor: Type.Union([Type.String(), Type.Null()]),
+});
+
+export type TransactionListResponseType = Static<
+  typeof TransactionListResponseSchema
 >;

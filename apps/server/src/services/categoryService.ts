@@ -1,8 +1,8 @@
 import { CategoryModel } from "../models/Category.js";
-import { CategoryResponseType } from "../schemas/categorySchema.js";
+import { Category } from "@pulse/types";
 
 export class CategoryService {
-  async getAllCategories(): Promise<CategoryResponseType[]> {
+  async getAllCategories(): Promise<Category[]> {
     const categories = await CategoryModel.find()
       .sort({
         isDefault: -1,

@@ -1,16 +1,37 @@
 import { Types } from "mongoose";
+import {
+  Transaction,
+  CreateTransactionInput,
+  TransactionListResponse,
+} from "@pulse/types";
 import { TransactionModel } from "../models/Transaction.js";
 import { CategoryModel } from "../models/Category.js";
-import {
-  CreateTransactionBodyType,
-  TransactionResponseType,
-  GetTransactionsQueryType,
-} from "../schemas/transactionSchema.js";
+import { GetTransactionsQueryType } from "../schemas/transactionSchema.js";
+
+interface DecodedCursor {
+  date: Date;
+  id: string;
+}
+
+const encodeCursor = (date: Date, id: string): string =>
+  Buffer.from(`${date.toISOString()}|${id}`, "utf8").toString("base64url");
+
+const decodeCursor = (cursor: string): DecodedCursor => {
+  try {
+    const raw = Buffer.from(cursor, "base64url").toString("utf8");
+    const [isoDate, id] = raw.split("|");
+    const date = new Date(isoDate);
+    if (!isoDate || !id || Number.isNaN(date.getTime())) {
+      throw new Error("malformed");
+    }
+    return { date, id };
+  } catch (error) {
+    throw new Error("INVALID_CURSOR");
+  }
+};
 
 export class TransactionService {
-  async createTransaction(
-    data: CreateTransactionBodyType,
-  ): Promise<TransactionResponseType> {
+  async createTransaction(data: CreateTransactionInput): Promise<Transaction> {
     const categoryExists = await CategoryModel.exists({ _id: data.categoryId });
     if (!categoryExists) throw new Error("CATEGORY_NOT_FOUND");
 
@@ -37,29 +58,43 @@ export class TransactionService {
 
   async getTransactionByUser(
     query: GetTransactionsQueryType,
-  ): Promise<TransactionResponseType[]> {
+  ): Promise<TransactionListResponse> {
     const filter: Record<string, any> = { userId: query.userId };
 
     if (query.cursor) {
-      filter._id = { $lt: new Types.ObjectId(query.cursor) };
+      const { date, id } = decodeCursor(query.cursor);
+      filter.$or = [
+        { date: { $lt: date } },
+        { date: date, _id: { $lt: new Types.ObjectId(id) } },
+      ];
     }
 
     const limit = query.limit || 20;
     const transactions = await TransactionModel.find(filter)
       .sort({ date: -1, _id: -1 })
-      .limit(limit)
+      .limit(limit + 1)
       .lean();
 
-    return transactions.map((t) => ({
-      id: t._id.toString(),
-      userId: t.userId,
-      categoryId: t.categoryId.toString(),
-      amountCents: t.amountCents,
-      type: t.type,
-      description: t.description,
-      date: t.date.toISOString(),
-      createdAt: t.createdAt.toISOString(),
-    }));
+    const hasMore = transactions.length > limit;
+    const pageItems = hasMore ? transactions.slice(0, limit) : transactions;
+
+    const last = pageItems[pageItems.length - 1];
+    const nextCursor =
+      hasMore && last ? encodeCursor(last.date, last._id.toString()) : null;
+
+    return {
+      items: pageItems.map((t) => ({
+        id: t._id.toString(),
+        userId: t.userId,
+        categoryId: t.categoryId.toString(),
+        amountCents: t.amountCents,
+        type: t.type,
+        description: t.description,
+        date: t.date.toISOString(),
+        createdAt: t.createdAt.toISOString(),
+      })),
+      nextCursor,
+    };
   }
 }
 
