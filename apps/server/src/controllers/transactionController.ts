@@ -20,7 +20,7 @@ export class TransactionController {
         return reply.badRequest("Invalid category id");
       }
       request.log.error(error, "Error creating transaction");
-      return reply.internalServerError("Could ot save transaction");
+      return reply.internalServerError("Could not save transaction");
     }
   }
 

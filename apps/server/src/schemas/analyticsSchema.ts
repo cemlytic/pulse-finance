@@ -10,9 +10,9 @@ export type AnalyticsQueryType = Static<typeof AnalyticsQuerySchema>;
 
 export const DailyFlowPointSchema = Type.Object({
   date: Type.String(),
-  expenseCents: Type.Integer(),
-  incomeCents: Type.Integer(),
-  netCents: Type.Integer(),
+  totalExpenseCents: Type.Integer(),
+  totalIncomeCents: Type.Integer(),
+  netSavingCents: Type.Integer(),
 });
 
 export const DailyFlowResponseSchema = Type.Array(DailyFlowPointSchema);

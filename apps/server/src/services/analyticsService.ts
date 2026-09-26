@@ -2,11 +2,19 @@ import { TransactionModel } from "../models/Transaction.js";
 import { DailyFlowPoint, CategoryBreakdownPoint } from "@pulse/types";
 import { AnalyticsQueryType } from "../schemas/analyticsSchema.js";
 
+interface RawCategoryAggregation {
+  categoryId: string;
+  categoryName: string;
+  icon: string;
+  colorHex: string;
+  totalCents: number;
+}
+
 export class AnalyticsService {
   async getDailyFlow(query: AnalyticsQueryType): Promise<DailyFlowPoint[]> {
     const { userId, startDate, endDate } = query;
 
-    const pipelineResult = await TransactionModel.aggregate([
+    const pipelineResult = await TransactionModel.aggregate<DailyFlowPoint>([
       {
         $match: {
           userId: userId,
@@ -22,12 +30,12 @@ export class AnalyticsService {
           _id: {
             $dateToString: { format: "%Y-%m-%d", date: "$date" },
           },
-          expenseCents: {
+          totalExpenseCents: {
             $sum: {
               $cond: [{ $eq: ["$type", "EXPENSE"] }, "$amountCents", 0],
             },
           },
-          incomeCents: {
+          totalIncomeCents: {
             $sum: {
               $cond: [{ $eq: ["$type", "INCOME"] }, "$amountCents", 0],
             },
@@ -39,9 +47,9 @@ export class AnalyticsService {
         $project: {
           _id: 0,
           date: "$_id",
-          expenseCents: 1,
-          incomeCents: 1,
-          netCents: { $subtract: ["$incomeCents", "$expenseCents"] },
+          totalExpenseCents: 1,
+          totalIncomeCents: 1,
+          netSavingCents: { $subtract: ["$incomeCents", "$expenseCents"] },
         },
       },
 
@@ -56,7 +64,7 @@ export class AnalyticsService {
   ): Promise<CategoryBreakdownPoint[]> {
     const { userId, startDate, endDate } = query;
 
-    const rawData = await TransactionModel.aggregate([
+    const rawData = await TransactionModel.aggregate<RawCategoryAggregation>([
       {
         $match: {
           userId: userId,

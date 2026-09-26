@@ -19,7 +19,7 @@ export const analyticsRoutes: FastifyPluginAsync = async (
         },
       },
     },
-    analyticsController.getDailyFlow,
+    analyticsController.getDailyFlow.bind(analyticsController),
   );
 
   app.get(

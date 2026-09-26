@@ -11,7 +11,7 @@ export class AnalyticsController {
       const data = await analyticsService.getDailyFlow(request.query);
       return reply.code(200).send(data);
     } catch (error) {
-      request.log.error("Failed to aggregate daily flow analytics");
+      request.log.error(error, "Failed to aggregate daily flow analytics");
       return reply.internalServerError("Could not calculate analytics.");
     }
   }
