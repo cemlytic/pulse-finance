@@ -1,0 +1,27 @@
+{
+  "name": "pulsefinance",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --workspace=@pulse/server",
+    "build:server": "npm run build --workspace=@pulse/server"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.3.0",
+    "@fastify/env": "^7.0.0",
+    "@fastify/sensible": "^6.0.5",
+    "@sinclair/typebox": "^0.34.52",
+    "dotenv": "^18.0.3",
+    "fastify": "^5.12.5",
+    "mongoose": "^9.10.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^7.0.2"
+  }
+}
