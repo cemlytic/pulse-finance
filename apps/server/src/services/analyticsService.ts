@@ -49,7 +49,7 @@ export class AnalyticsService {
           date: "$_id",
           totalExpenseCents: 1,
           totalIncomeCents: 1,
-          netSavingCents: { $subtract: ["$incomeCents", "$expenseCents"] },
+          netSavingCents: { $subtract: ["$totalIncomeCents", "$totalExpenseCents"] },
         },
       },
 
