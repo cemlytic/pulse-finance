@@ -1,9 +1,11 @@
+import { seedDefaultCategories } from "./services/seedService.js";
 import fastify from "fastify";
 import cors from "@fastify/cors";
 import fastifySensible from "@fastify/sensible";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { connectDb } from "./config/database.js";
+import { appRouter } from "./routes/index.js";
 
 dotenv.config();
 
@@ -27,6 +29,8 @@ await app.register(cors, {
   origin: "*",
 });
 await app.register(fastifySensible);
+
+await app.register(appRouter, { prefix: "/api/v1" });
 
 app.get("/health", async () => {
   return {
@@ -60,6 +64,7 @@ process.on("SIGTERM", () => graceFulShutdown("SIGTERM"));
 const start = async () => {
   try {
     await connectDb(MONGODB_URI);
+    await seedDefaultCategories();
     await app.listen({ port: PORT, host: HOST });
   } catch (error) {
     app.log.error(error);
@@ -68,4 +73,3 @@ const start = async () => {
 };
 
 start();
-
