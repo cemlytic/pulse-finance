@@ -1,7 +1,6 @@
 import { FastifyInstance, FastifyPluginAsync } from "fastify";
-import { CategoryModel } from "../models/Category.js";
 import { CategoryListResponseSchema } from "../schemas/categorySchema.js";
-import { categoryController } from "../controllers/categoryControllers.js";
+import { categoryController } from "../controllers/categoryController.js";
 
 export const categoryRoutes: FastifyPluginAsync = async (
   app: FastifyInstance,
