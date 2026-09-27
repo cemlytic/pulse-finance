@@ -6,7 +6,6 @@ export const MongoIdSchema = Type.String({
 });
 
 export const CreateTransactionBodySchema = Type.Object({
-  userId: Type.String({ minLength: 1 }),
   categoryId: MongoIdSchema,
   amountCents: Type.Integer({ minimum: 1 }),
   type: Type.Union([Type.Literal("INCOME"), Type.Literal("EXPENSE")]),
@@ -32,7 +31,6 @@ export const TransactionResponseSchema = Type.Object({
 export type TransactionResponseType = Static<typeof TransactionResponseSchema>;
 
 export const GetTransactionsQuerySchema = Type.Object({
-  userId: Type.String({ minLength: 1 }),
   limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 100, default: 20 })),
   cursor: Type.Optional(Type.String()),
 });

@@ -6,6 +6,8 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { connectDb } from "./config/database.js";
 import { appRouter } from "./routes/index.js";
+import { devAuthRoutes } from "./routes/devAuthRoutes.js";
+import fastifyJwt from "@fastify/jwt";
 
 dotenv.config();
 
@@ -29,6 +31,18 @@ await app.register(cors, {
   origin: "*",
 });
 await app.register(fastifySensible);
+
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET must be defined");
+}
+
+await app.register(fastifyJwt, {
+  secret: process.env.JWT_SECRET,
+});
+
+if (process.env.ENABLE_DEV_AUTH === "true") {
+  await app.register(devAuthRoutes, { prefix: "/api/v1" });
+}
 
 await app.register(appRouter, { prefix: "/api/v1" });
 

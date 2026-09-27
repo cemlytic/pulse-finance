@@ -12,6 +12,7 @@ export class TransactionController {
   ) {
     try {
       const transaction = await transactionService.createTransaction(
+        request.user.id,
         request.body,
       );
       return reply.code(201).send(transaction);
@@ -30,6 +31,7 @@ export class TransactionController {
   ) {
     try {
       const transactions = await transactionService.getTransactionByUser(
+        request.user.id,
         request.query,
       );
       return reply.code(200).send(transactions);

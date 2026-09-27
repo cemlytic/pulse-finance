@@ -1,7 +1,6 @@
 import { Type, Static } from "@sinclair/typebox";
 
 export const AnalyticsQuerySchema = Type.Object({
-  userId: Type.String({ minLength: 1 }),
   startDate: Type.String({ format: "date-time" }),
   endDate: Type.String({ format: "date-time" }),
 });
