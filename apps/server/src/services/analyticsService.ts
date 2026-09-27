@@ -11,8 +11,11 @@ interface RawCategoryAggregation {
 }
 
 export class AnalyticsService {
-  async getDailyFlow(query: AnalyticsQueryType): Promise<DailyFlowPoint[]> {
-    const { userId, startDate, endDate } = query;
+  async getDailyFlow(
+    userId: string,
+    query: AnalyticsQueryType,
+  ): Promise<DailyFlowPoint[]> {
+    const { startDate, endDate } = query;
 
     const pipelineResult = await TransactionModel.aggregate<DailyFlowPoint>([
       {
@@ -49,7 +52,9 @@ export class AnalyticsService {
           date: "$_id",
           totalExpenseCents: 1,
           totalIncomeCents: 1,
-          netSavingCents: { $subtract: ["$totalIncomeCents", "$totalExpenseCents"] },
+          netSavingCents: {
+            $subtract: ["$totalIncomeCents", "$totalExpenseCents"],
+          },
         },
       },
 
@@ -60,9 +65,10 @@ export class AnalyticsService {
   }
 
   async getCategoryBreakDown(
+    userId: string,
     query: AnalyticsQueryType,
   ): Promise<CategoryBreakdownPoint[]> {
-    const { userId, startDate, endDate } = query;
+    const { startDate, endDate } = query;
 
     const rawData = await TransactionModel.aggregate<RawCategoryAggregation>([
       {

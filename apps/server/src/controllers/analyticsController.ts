@@ -8,7 +8,10 @@ export class AnalyticsController {
     reply: FastifyReply,
   ) {
     try {
-      const data = await analyticsService.getDailyFlow(request.query);
+      const data = await analyticsService.getDailyFlow(
+        request.user.id,
+        request.query,
+      );
       return reply.code(200).send(data);
     } catch (error) {
       request.log.error(error, "Failed to aggregate daily flow analytics");
@@ -21,7 +24,10 @@ export class AnalyticsController {
     reply: FastifyReply,
   ) {
     try {
-      const data = await analyticsService.getCategoryBreakDown(request.query);
+      const data = await analyticsService.getCategoryBreakDown(
+        request.user.id,
+        request.query,
+      );
       return reply.code(200).send(data);
     } catch (error) {
       request.log.error(error, "Failed to aggregate category breakdown");

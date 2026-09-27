@@ -14,7 +14,9 @@
   "dependencies": {
     "@fastify/cors": "^11.3.0",
     "@fastify/env": "^7.0.0",
+    "@fastify/jwt": "^10.2.2",
     "@fastify/sensible": "^6.0.5",
+    "@fastify/type-provider-typebox": "^6.1.0",
     "@pulse/types": "file:../../packages/types",
     "@sinclair/typebox": "^0.34.52",
     "dotenv": "^18.0.3",

@@ -1,4 +1,5 @@
 import { FastifyInstance, FastifyPluginAsync } from "fastify";
+import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import { transactionController } from "../controllers/transactionController.js";
 import {
   CreateTransactionBodySchema,
@@ -6,13 +7,16 @@ import {
   GetTransactionsQuerySchema,
   TransactionListResponseSchema,
 } from "../schemas/transactionSchema.js";
+import { authenticate } from "../hooks/authenticate.js";
 
 export const transactionRoutes: FastifyPluginAsync = async (
-  app: FastifyInstance,
+  fastify: FastifyInstance,
 ) => {
+  const app = fastify.withTypeProvider<TypeBoxTypeProvider>();
   app.post(
     "/transactions",
     {
+      preHandler: [authenticate],
       schema: {
         body: CreateTransactionBodySchema,
         response: {
@@ -25,6 +29,7 @@ export const transactionRoutes: FastifyPluginAsync = async (
   app.get(
     "/transactions",
     {
+      preHandler: [authenticate],
       schema: {
         querystring: GetTransactionsQuerySchema,
         response: {

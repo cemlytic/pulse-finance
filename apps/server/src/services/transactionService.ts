@@ -31,12 +31,15 @@ const decodeCursor = (cursor: string): DecodedCursor => {
 };
 
 export class TransactionService {
-  async createTransaction(data: CreateTransactionInput): Promise<Transaction> {
+  async createTransaction(
+    userId: string,
+    data: CreateTransactionInput,
+  ): Promise<Transaction> {
     const categoryExists = await CategoryModel.exists({ _id: data.categoryId });
     if (!categoryExists) throw new Error("CATEGORY_NOT_FOUND");
 
     const newTransaction = await TransactionModel.create({
-      userId: data.userId,
+      userId: userId,
       categoryId: new Types.ObjectId(data.categoryId),
       amountCents: data.amountCents,
       type: data.type,
@@ -57,9 +60,10 @@ export class TransactionService {
   }
 
   async getTransactionByUser(
+    userId: string,
     query: GetTransactionsQueryType,
   ): Promise<TransactionListResponse> {
-    const filter: Record<string, any> = { userId: query.userId };
+    const filter: Record<string, any> = { userId };
 
     if (query.cursor) {
       const { date, id } = decodeCursor(query.cursor);
