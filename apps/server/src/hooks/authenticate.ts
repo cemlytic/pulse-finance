@@ -41,7 +41,7 @@ export async function authenticate(
     // request.user = { id: session.sub };
 
     await request.jwtVerify();
-    const tokenUserId = (request.user as any).sub || request.user.id;
+    const tokenUserId = request.user.sub || request.user.id;
 
     if (!tokenUserId) {
       return reply.status(401).send({
