@@ -36,6 +36,10 @@ if (!process.env.JWT_SECRET) {
   throw new Error("JWT_SECRET must be defined");
 }
 
+if (!process.env.CLERK_SECRET_KEY) {
+  throw new Error("CLERK_SECRET_KEY must be defined");
+}
+
 await app.register(fastifyJwt, {
   secret: process.env.JWT_SECRET,
 });

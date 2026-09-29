@@ -5,6 +5,7 @@
   "dependencies": {
     "@clerk/expo": "^4.7.1",
     "@pulse/types": "file:../../packages/types",
+    "axios": "^1.20.0",
     "expo": "~57.0.25",
     "expo-auth-session": "~57.0.13",
     "expo-constants": "~57.0.19",
