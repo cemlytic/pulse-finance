@@ -1,3 +1,4 @@
+import { verifyToken } from "@clerk/backend";
 import { FastifyReply, FastifyRequest } from "fastify";
 
 export async function authenticate(
@@ -32,26 +33,22 @@ export async function authenticate(
     }
   }
 
-  // 2. Production (Clerk verification) path
   try {
-    // TODO: Enable this one the mobile app (apps/mobile) is wired app.
-    // @clerk/backend's verifyToken
-    // const rawToken = request.headers.authorization?.replace("Bearer ", "");
-    // const session = await verifyToken(rawToken, { secretKey: process.env.CLERK_SECRET_KEY });
-    // request.user = { id: session.sub };
+    const rawToken = request.headers.authorization?.replace("Bearer ", "");
 
-    await request.jwtVerify();
-    const tokenUserId = request.user.sub || request.user.id;
-
-    if (!tokenUserId) {
+    if (!rawToken) {
       return reply.status(401).send({
         statusCode: 401,
         error: "Unauthorized",
-        message: "User ID not found in token",
+        message: "Missing bearer token",
       });
     }
 
-    request.user = { id: tokenUserId };
+    const verified = await verifyToken(rawToken, {
+      secretKey: process.env.CLERK_SECRET_KEY!,
+    });
+
+    request.user = { id: verified.sub };
   } catch {
     return reply.status(401).send({
       statusCode: 401,
